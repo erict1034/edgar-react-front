@@ -1,0 +1,92 @@
+
+Function before zero line enforcement
+
+function computeVisibleConceptRanges(rows, comparisonTraces, marginTraces, shareTraces, perShareTraces, amendmentRows, xStart, xEnd) {
+  let yMin = Infinity, yMax = -Infinity
+  rows.forEach(r => {
+    if (r.value == null) return
+    const dt = new Date(r.period_end)
+    if (xStart && dt < xStart) return
+    if (xEnd && dt > xEnd) return
+    if (r.value < yMin) yMin = r.value
+    if (r.value > yMax) yMax = r.value
+  })
+
+  amendmentRows?.forEach(a => {
+    if (a.amended_value == null) return
+    const dt = new Date(a.period_end)
+    if (xStart && dt < xStart) return
+    if (xEnd && dt > xEnd) return
+    if (a.amended_value < yMin) yMin = a.amended_value
+    if (a.amended_value > yMax) yMax = a.amended_value
+  })
+
+  let y2Min = Infinity, y2Max = -Infinity
+  shareTraces.forEach(trace => {
+    trace.x.forEach((xVal, i) => {
+      const dt = new Date(xVal)
+      if (xStart && dt < xStart) return
+      if (xEnd && dt > xEnd) return
+      const y = trace.y[i]
+      if (y == null) return
+      if (y < y2Min) y2Min = y
+      if (y > y2Max) y2Max = y
+    })
+  })
+
+  let y3Min = Infinity, y3Max = -Infinity
+  comparisonTraces.forEach(trace => {
+    trace.x.forEach((xVal, i) => {
+      const dt = new Date(xVal)
+      if (xStart && dt < xStart) return
+      if (xEnd && dt > xEnd) return
+      const y = trace.y[i]
+      if (y == null) return
+      if (y < y3Min) y3Min = y
+      if (y > y3Max) y3Max = y
+    })
+  })
+
+  let y4Min = Infinity, y4Max = -Infinity
+  marginTraces.forEach(trace => {
+    trace.x.forEach((xVal, i) => {
+      const dt = new Date(xVal)
+      if (xStart && dt < xStart) return
+      if (xEnd && dt > xEnd) return
+      const y = trace.y[i]
+      if (y == null) return
+      if (y < y4Min) y4Min = y
+      if (y > y4Max) y4Max = y
+    })
+  })
+
+  const yRange = yMin !== Infinity
+    ? [yMin - (yMax - yMin) * 0.1 || -1, yMax + (yMax - yMin) * 0.1 || 1]
+    : null
+  const y2Range = y2Min !== Infinity
+    ? [y2Min - (y2Max - y2Min) * 0.1 || -1, y2Max + (y2Max - y2Min) * 0.1 || 1]
+    : null
+  const y3Range = y3Min !== Infinity
+    ? [y3Min - (y3Max - y3Min) * 0.1 || -1, y3Max + (y3Max - y3Min) * 0.1 || 1]
+    : null
+  const y4Range = y4Min !== Infinity
+    ? [y4Min - (y4Max - y4Min) * 0.1 || -1, y4Max + (y4Max - y4Min) * 0.1 || 1]
+    : null
+
+  let y5Min = Infinity, y5Max = -Infinity
+  perShareTraces.forEach(trace => {
+    trace.x.forEach((xVal, i) => {
+      const dt = new Date(xVal)
+      if (xStart && dt < xStart) return
+      if (xEnd && dt > xEnd) return
+      const y = trace.y[i]
+      if (y == null) return
+      if (y < y5Min) y5Min = y
+      if (y > y5Max) y5Max = y
+    })
+  })
+  const y5Range = y5Min !== Infinity
+    ? [y5Min - (y5Max - y5Min) * 0.1 || -1, y5Max + (y5Max - y5Min) * 0.1 || 1]
+    : null
+
+  return { yRange, y2Range, y3Range, y4Range, y5Range }

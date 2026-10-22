@@ -1,0 +1,19 @@
+css/* 1. Make the wrapper fill the exact screen height */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; 
+  overflow: hidden; /* Prevents overall page scrolling */
+}
+
+/* 2. Let the top area take only the space it naturally needs */
+.top-area {
+  flex-shrink: 0; 
+}
+
+/* 3. Force the chart container to claim 100% of the remaining space */
+.chart-container {
+  flex-grow: 1; 
+  min-height: 0; /* Critical fix: allows the chart container to shrink if needed */
+  width: 100%;
+}

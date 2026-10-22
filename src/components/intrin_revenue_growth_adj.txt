@@ -1,0 +1,30 @@
+Two places control this, and they need to stay in sync or you'll get a 422 error when the slider goes past what the backend accepts.
+
+1. Backend validation bounds — in api/routers/intrinsic.py, the Query(...) bounds:
+
+python
+growth_5yr: float = Query(0.15, ge=0.0, le=1.0),
+growth_15yr: float = Query(0.07, ge=0.0, le=0.5),
+
+ge/le are the min/max FastAPI will accept — anything outside that range gets rejected with a 422 before it even reaches compute_intrinsic_value. Change the numbers, change the ceiling/floor. The first argument (0.15, 0.07) is just the default when the param is omitted, not a limit.
+
+2. Frontend slider range — in src/components/IntrinsicValueTab.jsx, the <input type="range"> min/max:
+
+jsx
+<input
+  type="range" min={0.0} max={0.50} step={0.01}
+  value={growth5yr}
+  onChange={e => setGrowth5yr(Number(e.target.value))}
+  style={{ width: '100%' }}
+/>
+jsx
+<input
+  type="range" min={0.0} max={0.20} step={0.005}
+  value={growth15yr}
+  onChange={e => setGrowth15yr(Number(e.target.value))}
+  style={{ width: '100%' }}
+/>
+
+step controls the granularity as you drag — 0.01 = 1% increments, 0.005 = half-percent.
+
+So to widen 5yr growth to, say, 0–100%: set max={0.50} → max={1.0} in the JSX, and le=1.0 stays as-is (already covers it) or raise it if you go past 100%. If you only change the frontend max without checking the backend le, you'll be able to drag the slider to a value the API then rejects.

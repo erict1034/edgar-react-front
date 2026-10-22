@@ -1,0 +1,41 @@
+Explaining an excess return model using a company's financials.
+Explaining an excess return model using a company's financials.
+The model values JPM’s common equity directly: what the bank is worth is its tangible book value plus the present value of the returns it earns above what shareholders require. It’s called an excess-return or residual-income model.
+
+The core idea
+
+If a bank earns exactly its cost of equity on its book, it’s worth book value, because extra growth adds nothing. If it earns more, it’s worth a premium, and the size of the premium depends on how large the excess return is and how long it lasts.
+
+Equity value = TCE₀ + Σ PV of residual income + PV of terminal residual income
+Residual income (year t) = (ROTCE_t − cost of equity) × TCE at start of year t
+Step by step, with your JPM numbers
+
+Starting point (TCE₀ = $288.36B). Tangible common equity is stockholders’ equity minus preferred stock, goodwill and other intangibles. It’s the FY2025 balance.
+Starting ROTCE (20.9%). Return on tangible common equity is net income to common divided by average TCE. The model averages the last three years, which gives 20.9%.
+Cost of equity (9.8%). CAPM: 4.2% risk-free rate plus beta × a 5.5% equity risk premium. Beta comes from yfinance. A bank’s debt is mostly operating funding, so there’s no WACC and no net-debt subtraction.
+Fade assumptions. ROTCE glides linearly from 20.9% to a terminal 15.3% (the midpoint of starting ROTCE and the cost of equity) over 10 years. Book growth glides from 5.5% (the historical TCE trend) down to 2.5% terminal growth.
+Each forecast year:
+Net income = ROTCE × beginning TCE. For 2026 that’s 20.92% × $288.36B = $60.33B.
+Residual income = net income − 9.8% × beginning TCE = $60.33B − $28.26B ≈ $32.1B.
+Ending TCE = beginning TCE × (1 + book growth) = $304.33B.
+Implied payout = net income − growth in TCE = $44.37B (73.5% of earnings). This is whatever isn’t retained, dividends plus buybacks, so it’s an output, not an input.
+Discount that year’s residual income at 9.8%.
+Terminal value. After year 10, ROTCE stays at 15.35% and book grows at 2.5% forever:
+   TV = (15.35% − 9.8%) × $427.4B ÷ (9.8% − 2.5%) ≈ $325B  → PV ≈ $128.5B
+Add up: $288.36B (book) + $184.41B (PV of years 1-10) + $128.54B (terminal) = $601.31B of common equity. Dividing by 2.66B shares gives $226.21 per share.
+Why this suits a bank
+
+Book and ROTCE are the clean inputs: they’re stable, well reported and tied to regulatory capital, unlike operating cash flow, which swings with loans, deposits and trading assets.
+Payout isn’t an input: growth in tangible book is set directly, so payout falls out (retention = growth ÷ ROTCE). That keeps ROTCE, growth and payout consistent. You can sanity-check the implied 74-84% against the historical 65% average.
+Current share count: value per share divides by today’s shares, not an average of forecast shares. Buybacks are already inside the payout, so dividing by a shrinking count would count them twice.
+What drives the answer
+
+Terminal ROTCE and cost of equity: these move the result most. The $128B terminal piece is 21% of value, and the 10-year PV is another 31%.
+The market gap: the market’s 3.13x P/TBV vs your 2.09x says investors expect JPM to hold a ROTCE near or above 20-25% for much longer than a fade to 15%, or they use a lower cost of equity (around 8.4%).
+Limitations
+
+Book value is FY2025 against a June 2026 share count, so about nine months of retained earnings are missing.
+The model doesn’t separately forecast credit losses, rate sensitivity or regulatory capital requirements. It captures them only through the ROTCE path.
+Beta and the 5.5% equity risk premium come from market data and a fixed assumption. They’re the weakest inputs, so use the sliders to see how value moves.
+I can add the sensitivity grid next: cost of equity against terminal ROTCE, with the market’s implied combination marked.
+
