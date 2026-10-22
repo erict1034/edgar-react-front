@@ -1427,7 +1427,7 @@ export default function IntrinsicValueTab({ state }) {
     const sliderFcfMargin = fcfMargin ?? kpis?.effective_fcf_margin ?? FALLBACK_FCF_MARGIN
     const sliderGrowth5yr = growth5yr ?? kpis?.growth_5yr ?? DEFAULT_GROWTH_5YR
     const sliderGrowth15yr = growth15yr ?? kpis?.growth_15yr ?? DEFAULT_GROWTH_15YR
-    const effectiveDiscount = kpis?.effective_discount ?? discount
+    const effectiveDiscount = discountMode === 'manual' ? discount : (kpis?.effective_discount ?? discount)
     const terminalTooHigh = terminalGrowth >= effectiveDiscount
     const historicalDefaultVisibility =
         fcfMethod === 'ocf'
@@ -1520,12 +1520,22 @@ export default function IntrinsicValueTab({ state }) {
                             <input type="radio" checked={discountMode === 'auto'} onChange={() => setDiscountMode('auto')} /> Auto (WACC)
                         </label>
                         <label>
-                            <input type="radio" checked={discountMode === 'manual'} onChange={() => setDiscountMode('manual')} /> Manual
+                            <input
+                                type="radio"
+                                checked={discountMode === 'manual'}
+                                onChange={() => {
+                                    // Start manual from the current auto WACC instead of jumping to the default.
+                                    if (discountMode === 'auto' && Number.isFinite(kpis?.effective_discount)) {
+                                        setDiscount(Math.round(kpis.effective_discount * 10000) / 10000)
+                                    }
+                                    setDiscountMode('manual')
+                                }}
+                            /> Manual
                         </label>
                     </div>
                     <input
-                        type="range" min={0.05} max={0.15} step={0.005}
-                        value={Math.min(0.15, Math.max(0.05, discount))}
+                        type="range" min={0.02} max={0.30} step={0.005}
+                        value={Math.min(0.30, Math.max(0.02, effectiveDiscount))}
                         disabled={discountMode === 'auto'}
                         onChange={e => setDiscount(Number(e.target.value))}
                         style={{ width: '100%' }}
