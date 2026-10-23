@@ -484,12 +484,33 @@ function perShareId(numeratorValue, denominatorConcept) {
 }
 
 const VIEW_OPTIONS = [
-  { value: 'price', label: 'Prices' },
-  { value: 'concept', label: 'Financials' },
+  { value: 'price', label: 'Price Chart' },
+  { value: 'concept', label: 'Financial Chart' },
   { value: 'intrinsic', label: 'Intrinsic Value' },
   { value: 'browser', label: 'SQL' },
 
 ]
+
+function readChartTheme() {
+  const style = getComputedStyle(document.documentElement)
+  const v = (name, fallback) => style.getPropertyValue(name).trim() || fallback
+  return {
+    bg: v('--bg', '#ffffff'),
+    border: v('--border', '#e5e4e7'),
+    text: v('--text', '#6b6375'),
+    textH: v('--text-h', '#08060d'),
+    line: v('--chart-line', '#ffffff'),
+    ma50: v('--chart-ma50', '#59cf22'),
+    ma200: v('--chart-ma200', '#8d05fc'),
+    split: v('--chart-split', '#F4A442'),
+    amendment: v('--chart-amendment', '#e07b39'),
+    amendmentBorder: v('--chart-amendment-border', '#ffffff'),
+    gridStrong: v('--chart-grid-strong', '#322f2f'),
+    gridFaint: v('--chart-grid-faint', '#141212'),
+    gridXAxis: v('--chart-grid-xaxis', '#080808'),
+    tick: v('--chart-tick', '#736b6b'),
+  }
+}
 
 function App() {
   const [tickers, setTickers] = useState([])
@@ -497,26 +518,14 @@ function App() {
   const [ticker, setTicker] = useState('')
   const [priceData, setPriceData] = useState(null)
 
-  const [chartTheme] = useState(() => {
-    const style = getComputedStyle(document.documentElement)
-    const v = (name, fallback) => style.getPropertyValue(name).trim() || fallback
-    return {
-      bg: v('--bg', '#ffffff'),
-      border: v('--border', '#e5e4e7'),
-      text: v('--text', '#6b6375'),
-      textH: v('--text-h', '#08060d'),
-      line: v('--chart-line', '#ffffff'),
-      ma50: v('--chart-ma50', '#59cf22'),
-      ma200: v('--chart-ma200', '#8d05fc'),
-      split: v('--chart-split', '#F4A442'),
-      amendment: v('--chart-amendment', '#e07b39'),
-      amendmentBorder: v('--chart-amendment-border', '#ffffff'),
-      gridStrong: v('--chart-grid-strong', '#322f2f'),
-      gridFaint: v('--chart-grid-faint', '#141212'),
-      gridXAxis: v('--chart-grid-xaxis', '#080808'),
-      tick: v('--chart-tick', '#736b6b'),
-    }
-  })
+  const [chartTheme, setChartTheme] = useState(readChartTheme)
+
+  useEffect(() => {
+    const colorScheme = window.matchMedia('(prefers-color-scheme: dark)')
+    const updateChartTheme = () => setChartTheme(readChartTheme())
+    colorScheme.addEventListener('change', updateChartTheme)
+    return () => colorScheme.removeEventListener('change', updateChartTheme)
+  }, [])
 
   const [priceXRange, setPriceXRange] = useState(null)
   const [priceRangeLabel, setPriceRangeLabel] = useState('All')
@@ -1957,6 +1966,7 @@ function App() {
         <input
           type="text"
           placeholder="New ticker (e.g. NVDA)"
+          title="Pulling a new ticker can take over two minutes. Select an existing ticker from the dropdown for instant results."
           value={newTickerInput}
           onChange={e => setNewTickerInput(e.target.value)}
           style={{ width: 110, height: 30, fontSize: 13, boxSizing: 'border-box' }}
@@ -2696,6 +2706,25 @@ function App() {
         </div>
       </AppBar>
 
+      {(() => {
+        const pulling = pullStatus?.status === 'pending' || pullStatus?.status === 'running'
+        return (
+          <div
+            role="status"
+            style={{
+              padding: '4px 12px',
+              fontSize: 12,
+              color: pulling ? '#d9a441' : 'var(--menu-text-muted)',
+              borderBottom: '1px solid var(--menu-border)',
+            }}
+          >
+            {pulling
+              ? `Pulling data for ${pullStatus.ticker || newTickerInput.trim().toUpperCase() || ticker}. This can take over two minutes.`
+              : 'Note: pulling a new ticker can take over two minutes. Selecting an existing ticker from the dropdown is much faster.'}
+          </div>
+        )
+      })()}
+
       <div style={{ padding: '3px 3px', flex: '1 1 auto', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
 
         {view === 'price' && ticker && (
@@ -2760,9 +2789,12 @@ function App() {
                   ]}
                   layout={{
                     ...PLOT_LAYOUT_INTERACTION,
-                    title: `${ticker} Share Price`,
+                    font: { color: chartTheme.text, size: 12 },
                     showlegend: true,
-                    legend: { orientation: 'h', yanchor: 'bottom', y: 1.02, xanchor: 'right', x: 1 },
+                    legend: {
+                      orientation: 'h', yanchor: 'bottom', y: 1.02, xanchor: 'right', x: 1,
+                      font: { color: chartTheme.text, size: 11 },
+                    },
                     margin: { l: 80, r: 60, t: 10, b: 35, pad: 2 },
                     uirevision: `price-${ticker}-${priceZoomVersion}`,
                     paper_bgcolor: chartTheme.bg,

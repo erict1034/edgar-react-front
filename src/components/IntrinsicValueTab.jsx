@@ -101,6 +101,20 @@ function SliderField({
     )
 }
 
+function SliderInfoPanel({ children }) {
+    return (
+        <div style={{
+            border: '1px solid var(--menu-border)',
+            borderRadius: 6,
+            padding: '8px 10px',
+            fontSize: 12,
+        }}>
+            <div style={{ fontWeight: 600, marginBottom: 4 }}>How these assumptions work</div>
+            {children}
+        </div>
+    )
+}
+
 
 function CollapsibleSection({
     title,
@@ -1204,6 +1218,19 @@ function ExcessReturnView({ ticker, conceptOverrides, onResult, beforeTables }) 
             ))}
             {error && <div style={{ fontSize: 12, color: 'var(--menu-danger)' }}>{error}</div>}
 
+            <SliderInfoPanel>
+                <div style={{ color: 'var(--menu-text-muted)', marginBottom: 6 }}>
+                    Changes recalculate the valuation. Clear a value to return to its automatic assumption.
+                </div>
+                <ul style={{ margin: 0, paddingLeft: 18, display: 'grid', gap: 3 }}>
+                    <li><strong>Cost of Equity:</strong> discounts future excess returns; higher cost generally lowers value. Auto uses CAPM.</li>
+                    <li><strong>Starting ROTCE:</strong> the forecast's initial return on tangible common equity; auto uses the recent 3-year average.</li>
+                    <li><strong>Terminal ROTCE:</strong> the long-run return assumption; auto uses the midpoint of starting ROTCE and cost of equity.</li>
+                    <li><strong>Book Growth:</strong> starting tangible-book growth; auto is based on the historical trend.</li>
+                    <li><strong>Terminal Growth:</strong> long-run growth after the forecast; it must be below the cost of equity.</li>
+                </ul>
+            </SliderInfoPanel>
+
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20 }}>
                 <SliderField
                     label="Cost of Equity"
@@ -1500,6 +1527,20 @@ export default function IntrinsicValueTab({ state }) {
 
             {error && <div style={{ fontSize: 12, color: 'var(--menu-danger)' }}>{error}</div>}
 
+            <SliderInfoPanel>
+                <div style={{ color: 'var(--menu-text-muted)', marginBottom: 6 }}>
+                    Make changes to recalculate the valuation. Clear the value in its input box to restore the model's estimate.
+                </div>
+                <ul style={{ margin: 0, paddingLeft: 18, display: 'grid', gap: 3 }}>
+                    <li><strong>Discount Rate:</strong> discounts forecast cash flows; higher rates generally lower value. Auto uses WACC, or choose Manual.</li>
+                    <li><strong>5yr Revenue Growth:</strong> the forecast starts at this growth rate in year 1, then moves toward the 15yr rate.</li>
+                    <li><strong>15yr Revenue Growth:</strong> starts at about half the 5yr rate; the forecast reaches this rate in year 6, then moves toward terminal growth by year 20.</li>
+                    <li><strong>Terminal Growth:</strong> long-run growth after the 20-year forecast; it must be below the discount rate.</li>
+                    <li><strong>FCF Margin:</strong> the percentage of forecast revenue treated as free cash flow.</li>
+                    <li><strong>Dilution CAGR:</strong> compounds forecast diluted shares over 20 years. It is estimated from share history, or defaults to 0% if there is not enough usable data.</li>
+                </ul>
+            </SliderInfoPanel>
+
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20 }}>
                 <div style={{ minWidth: 220 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 2 }}>
@@ -1578,7 +1619,13 @@ export default function IntrinsicValueTab({ state }) {
                     value={sliderGrowth15yr}
                     onChange={setGrowth15yr}
                     min={-0.2} max={2.0} step={0.02}
-                />
+                >
+                    {Math.abs(sliderGrowth15yr) > 0.15 && (
+                        <div style={{ fontSize: 11, color: '#d9a441' }}>
+                            15yr Revenue Growth is high.
+                        </div>
+                    )}
+                </SliderField>
 
 
 
@@ -1611,7 +1658,18 @@ export default function IntrinsicValueTab({ state }) {
                     value={sliderFcfMargin}
                     onChange={setFcfMargin}
                     min={-0.5} max={0.95} step={0.01}
-                />
+                >
+                    {fcfMargin == null && kpis?.fcf_margin_defaulted && (
+                        <div style={{ fontSize: 11, color: '#d9a441' }}>
+                            Calculated FCF margin was negative, defaulted to 0%.
+                        </div>
+                    )}
+                    {sliderFcfMargin < 0 && (
+                        <div style={{ fontSize: 11, color: '#d9a441' }}>
+                            FCF Margin is negative.
+                        </div>
+                    )}
+                </SliderField>
 
 
                 <div
@@ -1639,7 +1697,13 @@ export default function IntrinsicValueTab({ state }) {
                     onChange={setDilutionCagr}
                     min={-0.05} max={0.15} step={0.001}
                     decimals={2}
-                />
+                >
+                    {Math.abs(dilutionCagr ?? kpis?.dilution_cagr ?? 0) > 0.05 && (
+                        <div style={{ fontSize: 11, color: '#d9a441' }}>
+                            Dilution CAGR is high.
+                        </div>
+                    )}
+                </SliderField>
 
             </div>
 

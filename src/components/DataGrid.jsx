@@ -78,7 +78,24 @@ export default function DataGrid({
 }) {
     const key = suffix => `grid:${tableId}:${suffix}`
 
-    const [sorting, setSorting] = useState(() => loadState(key('sorting'), []))
+    const initialColumnOrder = useMemo(
+        () => columns.map(col => col.id ?? col.accessorKey).filter(Boolean),
+        [columns]
+    )
+
+    const [sortingState, setSorting] = useState(() => {
+        const saved = loadState(key('sorting'), [])
+        return Array.isArray(saved)
+            ? saved.filter(sort => sort && initialColumnOrder.includes(sort.id))
+            : []
+    })
+    const sorting = useMemo(
+        () => sortingState.filter(sort => initialColumnOrder.includes(sort.id)),
+        [sortingState, initialColumnOrder]
+    )
+    useEffect(() => {
+        if (sorting.length !== sortingState.length) setSorting(sorting)
+    }, [sorting, sortingState.length])
     useEffect(() => {
         saveState(key('sorting'), sorting)
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -104,11 +121,6 @@ export default function DataGrid({
     }, [tableId, columnSizing])
 
     const [columnMenuOpen, setColumnMenuOpen] = useState(false)
-
-    const initialColumnOrder = useMemo(
-        () => columns.map(col => col.id ?? col.accessorKey).filter(Boolean),
-        [columns]
-    )
 
     const [columnOrder, setColumnOrder] = useState(() =>
         reconcileOrder(loadState(key('order'), initialColumnOrder), initialColumnOrder)

@@ -146,7 +146,7 @@ export const DEFAULT_DISCOUNT = 0.10
 export const DEFAULT_TERMINAL_GROWTH = 0.025
 export const DEFAULT_GROWTH_5YR = 0.15
 export const DEFAULT_GROWTH_15YR = 0.07
-export const FALLBACK_FCF_MARGIN = 0.15
+export const FALLBACK_FCF_MARGIN = 0
 
 
 

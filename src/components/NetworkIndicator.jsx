@@ -43,7 +43,7 @@ export default function NetworkIndicator() {
             </div>
             {slow && (
                 <div role="status" style={{ position: 'fixed', top: 10, left: '50%', transform: 'translateX(-50%)', zIndex: 10000, padding: '6px 14px', borderRadius: 6, fontSize: 13, background: '#1f2937', color: '#fff', boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
-                    Still loading… the free server may be waking up (up to ~1 minute).
+                    Still loading… the free server may be waking up (1 - 2 minutes).
                 </div>
             )}
         </>
