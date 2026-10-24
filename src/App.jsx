@@ -2979,7 +2979,7 @@ function App() {
                   </option>
                 ))}
               </select>
-              <select value={browserFilterCol} onChange={e => setBrowserFilterCol(e.target.value)} disabled={browserSqlActive || (browserTableNeedsTicker && !ticker)}>
+              <select value={browserFilterCol} onChange={e => { setBrowserFilterCol(e.target.value); setBrowserOffset(0) }} disabled={browserSqlActive || (browserTableNeedsTicker && !ticker)}>
                 <option value="">Filter column...</option>
                 {browserColumnsMeta.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
               </select>
@@ -2987,8 +2987,8 @@ function App() {
                 type="text"
                 placeholder="contains..."
                 value={browserFilterVal}
-                onChange={e => setBrowserFilterVal(e.target.value)}
-                disabled={browserSqlActive || !ticker || !browserFilterCol}
+                onChange={e => { setBrowserFilterVal(e.target.value); setBrowserOffset(0) }}
+                disabled={browserSqlActive || (browserTableNeedsTicker && !ticker) || !browserFilterCol}
                 style={{ width: 140 }}
               />
               <div ref={browserColumnRef} style={{ position: 'relative', display: 'inline-block' }}>
