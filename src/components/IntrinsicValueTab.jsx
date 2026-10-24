@@ -695,7 +695,7 @@ const payloadColumns = [
         id: 'term',
         header: 'Term',
         meta: { align: 'left' },
-        size: '45'
+        size: 165
     }),
 
     columnHelper.accessor('revenue', {
