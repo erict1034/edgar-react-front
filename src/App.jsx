@@ -3119,6 +3119,27 @@ function App() {
         )}
         {view === 'intrinsic' && ticker && <IntrinsicValueTab state={intrinsicState} />}
 
+        {view === 'price' && !ticker && (
+          <div style={{ maxWidth: 640, margin: '40px auto', padding: 20, border: '1px solid #ccc', borderRadius: 8, lineHeight: 1.5 }}>
+            <h2 style={{ marginTop: 0 }}>Welcome</h2>
+            <p>
+              <strong>What it does:</strong> This app pulls company filings from SEC EDGAR and turns them into
+              price charts, financial statement concepts, per-share and margin metrics, and intrinsic value estimates.
+              Select a ticker above, or enter a new one and pull fresh data, to get started.
+            </p>
+            <p><strong>Created by:</strong> Eric Tullis</p>
+            <p>
+              <strong>How it was built:</strong> A Python FastAPI backend processes SEC EDGAR data into a SQLite
+              database, and a React (Vite) front end displays it.
+            </p>
+            <p>
+              <strong>AI assistance:</strong> Eric Tullis designed and directed the project, with code developed
+              in collaboration with Anthropic Claude and GitHub Copilot, which helped write, debug, and refine
+              the backend and front-end code. Other Ai tools were used as needed for research and development purposes.
+            </p>
+          </div>
+        )}
+
 
 
       </div>
